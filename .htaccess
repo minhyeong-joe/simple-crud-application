@@ -1,0 +1,16 @@
+Options -MultiViews
+RewriteEngine On
+
+# To externally redirect /dir/foo.php to /dir/foo
+RewriteCond %{REQUEST_METHOD} !(POST|GET) [NC]
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s([^.]+)\.php [NC]
+RewriteRule ^ %1 [R=301,NE,L]
+
+RewriteRule ^knowledge-center/(\d+)(?:/.*)?$ knowledge-center-desc.php?id=$1 [QSA,L,NC]
+
+# To internally forward /dir/foo to /dir/foo.php
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteRule ^(.*?)/?$ $1.php [L]
+
+Options -Indexes
