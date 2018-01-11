@@ -64,8 +64,8 @@
               $uploadOk = 0;
             }
           }
-          $username = $_POST['username'];
-          $comment = $_POST['comment'];
+          $username = mysqli_real_escape_string($db, $_POST['username']);
+          $comment = mysqli_real_escape_string($db, $_POST['comment']);
           if ($username && $comment) {
             if ($uploadOk) {
               create($image, $username, $comment);
