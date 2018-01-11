@@ -22,6 +22,9 @@
   margin: 10px auto;
   width: 90%;
 }
+.badge.badge-secondary {
+  margin-left: 0.5rem;
+}
 .footer {
   text-align: center;
   margin-bottom: 0 !important;

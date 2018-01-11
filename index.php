@@ -8,16 +8,10 @@
   ##############################
 
   // MySQL connection & crud functions
-  require_once('inc/functions.php');
+  include('inc/config.php');
+  include('inc/functions.php');
 
-  if(isset($_POST['post'])) {
-    $fieldError = false;
-    if (isset($_POST['username']) && isset($_POST['comment'])) {
 
-    } else {
-      $fieldError = true;
-    }
-  }
 
   include('inc/header.php');
 
@@ -28,11 +22,10 @@
     <div class="add-post">
       <form enctype="multipart/form-data" method="POST">
         <div class="custom-file">
-          <input type="file" class="custom-file-input" id="customFile">
+          <input type="file" class="custom-file-input" id="image" name="image">
           <label class="custom-file-label" for="image">Choose Image</label>
-          <small id="emailHelp" class="form-text text-muted">File size < [filesize_limit]</small>
-          <small id="emailHelp" class="form-text text-muted">aspect ratio limit</small>
-          <small id="emailHelp" class="form-text text-muted">Image type: jpg, png</small>
+          <small id="emailHelp" class="form-text text-muted">File size < 200KB</small>
+          <small id="emailHelp" class="form-text text-muted">Image type: jpg, png, jpeg</small>
         </div>
         <div class="form-group">
           <label for="username">Username <font color='red'>*</font></label>
@@ -43,11 +36,51 @@
           <textarea class="form-control" id="comment" rows="3" name="comment" maxlength="500"></textarea>
         </div>
         <?php
-          if ($fieldError) {
+
+        // When Post clicked, CREATE using create function in functions.php
+        if(isset($_POST['post'])) {
+          $image = $_FILES['image']['name'];
+          $uploadOk = 1;
+          if ($image) {
+            $path_info = pathinfo($image);
+            $extension = $path_info['extension'];
+            $imageFileType = strtolower($extension);
+            $image = uniqid().".".$imageFileType;
+            $target = "img/upload/$image";
+
+            // check for image type
+            if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg") {
+              echo "<div class='alert alert-danger' role='alert'>
+                Sorry, only JPG, JPEG, PNG files are allowed.
+              </div>";
+              $uploadOk = 0;
+            }
+
+            //check for file size
+            if ($_FILES['image']['size'] > 200000) {
+              echo "<div class='alert alert-danger' role='alert'>
+                Sorry, your file is too large.
+              </div>";
+              $uploadOk = 0;
+            }
+          }
+          $username = $_POST['username'];
+          $comment = $_POST['comment'];
+          if ($username && $comment) {
+            if ($uploadOk) {
+              create($image, $username, $comment);
+              if ($image) {
+                move_uploaded_file($_FILES['image']['tmp_name'], $target) or die ("ERROR! Failed to upload the image.");
+              }
+              header("refresh: 0;");
+            }
+          } else {
             echo "<div class='alert alert-danger' role='alert'>
               All fields need to be filled!
             </div>";
           }
+        }
+
         ?>
         <button type="submit" class="btn btn-primary" name="post">Post</button>
       </form>
@@ -55,74 +88,28 @@
 
     <div class="post-section">
       <?php
-        while($row = mysqli_fetch_array($table)) {
-          echo "<div class='card'>";
-            echo "<div class='row justify-content-center'>";
-              echo "<div class='col-sm-4'>";
-                echo "<img class='card-img-top' src='img/upload/".$row['image']."' alt='".$row['image']."'>";
-              echo "</div>";
-              echo "<div class='col-sm-8'>";
-                echo "<div class='card-body'>";
-                  echo "<h5 class='card-title'>".$row['username']."</h5>";
-                  echo "<p class='card-text'>".$row['comment']."</p>";
-                echo "</div>"; // end of card-body
-              echo "</div>"; // end of .col
-            echo "</div>"; // end of .row
-          echo "</div>"; // end of .card
-        }
+        while($row = mysqli_fetch_array($result)) {
+          $image = $row['image'];
+          $username = $row['username'];
+          $timestamp = $row['timestamp'];
+          $comment = $row['comment'];
+
       ?>
-      <!-- <div class='card'>
+      <div class='card'>
         <div class='row justify-content-center'>
           <div class='col-sm-4'>
-            <img class='card-img-top' src='img/250by200.jpg' alt='Card image cap'>
+            <img class='card-img-top' src='<?php if($image) { echo "img/upload/$image"; } else { echo "http://via.placeholder.com/250x200";} ?>' alt='Card image cap'>
           </div>
           <div class='col-sm-8'>
             <div class='card-body'>
-              <h5 class='card-title'>Special title treatment</h5>
-              <p class='card-text'>With supporting text below as a natural lead-in to additional content.</p>
+              <h5 class='card-title'><?php echo $username; ?><span class="badge badge-secondary"><i class="fa fa-clock-o" aria-hidden="true"></i> <?php echo $timestamp; ?></span></h5>
+              <p class='card-text'><?php echo nl2br(htmlspecialchars($comment)); ?></p>
             </div>
           </div>
         </div>
       </div>
-      <div class="card">
-        <div class="row justify-content-center">
-          <div class="col-sm-4">
-            <img class="card-img-top" src="img/240by300.png" alt="Card image cap">
-          </div>
-          <div class="col-sm-8">
-            <div class="card-body">
-              <h5 class="card-title">Special title treatment</h5>
-              <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="row justify-content-center">
-          <div class="col-sm-4">
-            <img class="card-img-top" src="img/350by150.png" alt="Card image cap">
-          </div>
-          <div class="col-sm-8">
-            <div class="card-body">
-              <h5 class="card-title">Special title treatment</h5>
-              <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="row justify-content-center">
-          <div class="col-sm-4">
-            <img class="card-img-top" src="img/1280by720.png" alt="Card image cap">
-          </div>
-          <div class="col-sm-8">
-            <div class="card-body">
-              <h5 class="card-title">Special title treatment</h5>
-              <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-            </div>
-          </div>
-        </div>
-      </div> -->
+
+      <?php } // end of while statement ?>
 
     </div> <!-- end of .post-section -->
 
