@@ -1,7 +1,7 @@
 
     <div class="jumbotron jumbotron-fluid footer">
       <div class="container">
-        <h3>&copy; Minhyeong Joe</h3>
+        <h5>&copy; Minhyeong Joe</h5>
       </div>
     </div>
 
