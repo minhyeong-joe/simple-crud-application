@@ -5,7 +5,7 @@
 
 define("DB_HOST", "localhost"); // hostname
 define("DB_USERNAME", "root"); // username
-define("DB_PASSWORD", "alsgud92"); // password
+define("DB_PASSWORD", "root"); // password
 define("DB_DATABASE", "crud-application"); // database name
 
 define("DB_TABLE", "post"); // table name
